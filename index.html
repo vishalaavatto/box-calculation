@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Calculation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control, .form-select {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            width: 100%;
+            margin-top: 15px;
+        }
+        #totalPrice {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
+        <h2>Box Calculation</h2>
+        <div class="mb-3">
+            <label class="form-label">Length (in inch)</label>
+            <input type="number" id="length" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Width (in inch)</label>
+            <input type="number" id="width" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Height (in inch)</label>
+            <input type="number" id="height" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ply</label>
+            <select id="ply" class="form-select">
+                <option value="3">3 Ply</option>
+                <option value="5">5 Ply</option>
+                <option value="7">7 Ply</option>
+            </select>
+        </div>
+        <div class="mb-3" id="gsmInputs"></div>
+        <div class="mb-3">
+            <label class="form-label">Paper Type</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="paper" value="natural" checked>
+                <label class="form-check-label">Natural</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="paper" value="golden">
+                <label class="form-check-label">Golden</label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Printing Type</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="print" value="no" checked>
+                <label class="form-check-label">No Print</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="print" value="single">
+                <label class="form-check-label">Single Color</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="print" value="double">
+                <label class="form-check-label">Double Color</label>
+            </div>
+        </div>
+        <button class="btn btn-primary" id="calculate">Calculate</button>
+        <h3 class="mt-4 text-center">Total Price: <span id="totalPrice">0</span> INR</h3>
+    </div>
+    <script>
+        function generateGSMInputs(ply) {
+            let inputFields = '';
+            for (let i = 1; i <= ply; i++) {
+                inputFields += `<div class="mb-2"><input type="number" class="form-control" id="gsm${i}" placeholder="GSM ${i}" required></div>`;
+            }
+            $("#gsmInputs").html(inputFields);
+        }
+        
+        $(document).ready(function () {
+            generateGSMInputs(3);
+            
+            $('#ply').change(function () {
+                generateGSMInputs($(this).val());
+            });
+            
+            $('#calculate').click(function () {
+                let length = parseFloat($('#length').val());
+                let width = parseFloat($('#width').val());
+                let height = parseFloat($('#height').val());
+                let ply = parseInt($('#ply').val());
+                let paperType = $('input[name="paper"]:checked').val();
+                let printType = $('input[name="print"]:checked').val();
+                
+                let decal = width + height;
+                let totalWidth = length + width;
+                let sheetSize = decal * totalWidth;
+                
+                let totalGSM = 0;
+                for (let i = 1; i <= ply; i++) {
+                    totalGSM += parseFloat($(`#gsm${i}`).val()) || 0;
+                }
+                
+                let boxPrice = (sheetSize * totalGSM) / 1550;
+                if (printType === 'single') boxPrice += 1;
+                if (printType === 'double') boxPrice += 2;
+                if (paperType === 'golden') boxPrice += 1;
+                
+                $('#totalPrice').text(boxPrice.toFixed(2));
+            });
+        });
+    </script>
+</body>
+</html>
