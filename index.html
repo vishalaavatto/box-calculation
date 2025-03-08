@@ -38,7 +38,7 @@
         }
     </style>
 </head>
-<body class="d-flex justify-content-center align-items-center vh-100">
+<body class="d-flex justify-content-center align-items-center ">
     <div class="container">
         <h2>Box Calculation</h2>
         <div class="mb-3">
@@ -53,6 +53,7 @@
             <label class="form-label">Height (in inch)</label>
             <input type="number" id="height" class="form-control" required>
         </div>
+       
         <div class="mb-3">
             <label class="form-label">Ply</label>
             <select id="ply" class="form-select">
@@ -88,8 +89,14 @@
                 <label class="form-check-label">Double Color</label>
             </div>
         </div>
+         <div class="mb-3">
+            <label class="form-label">Price Per KG</label>
+            <input type="number" id="pricePerKg" class="form-control" required>
+        </div>
         <button class="btn btn-primary" id="calculate">Calculate</button>
         <h3 class="mt-4 text-center">Total Price: <span id="totalPrice">0</span> INR</h3>
+        <h3 class="mt-4 text-center">Total Weight in KG: <span id="boxWeight">0</span> </h3>
+        
     </div>
     <script>
         function generateGSMInputs(ply) {
@@ -112,24 +119,32 @@
                 let width = parseFloat($('#width').val());
                 let height = parseFloat($('#height').val());
                 let ply = parseInt($('#ply').val());
+                let pricePerKg=parseFloat($('#pricePerKg').val());
                 let paperType = $('input[name="paper"]:checked').val();
                 let printType = $('input[name="print"]:checked').val();
                 
-                let decal = width + height;
-                let totalWidth = length + width;
+                let decal = width + height+1;
+                console.log("Decal=" + decal)
+                let totalWidth = ((length + width)*2) + 2;
+                    console.log("Total Widht=" + totalWidth)
                 let sheetSize = decal * totalWidth;
-                
+                 console.log("Sheet Size=" + sheetSize)
                 let totalGSM = 0;
                 for (let i = 1; i <= ply; i++) {
                     totalGSM += parseFloat($(`#gsm${i}`).val()) || 0;
                 }
-                
-                let boxPrice = (sheetSize * totalGSM) / 1550;
+                console.log("total GSM=" + totalGSM)
+                let boxWeight = ((sheetSize * totalGSM) / 1550)/1000;
+                console.log("total Weigth=" + boxWeight)
+                let boxPrice = boxWeight*pricePerKg;
+                console.log("Box Price =" + boxPrice)
                 if (printType === 'single') boxPrice += 1;
                 if (printType === 'double') boxPrice += 2;
+                 console.log("Box Price after Print=" + boxPrice)
                 if (paperType === 'golden') boxPrice += 1;
-                
+                 console.log("Box Price after paper=" + boxPrice)
                 $('#totalPrice').text(boxPrice.toFixed(2));
+                $('#boxWeight').text(boxWeight.toFixed(3));
             });
         });
     </script>
